@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Product Associate (PA) - Operational Risk & Catalog Training Matrix</title>
+    <style>
+        :root {
+            --primary-color: #232f3e; /* Amazon Dark Navy */
+            --secondary-color: #ff9900; /* Amazon Orange */
+            --accent-color: #146eb4; /* Amazon Blue */
+            --danger-color: #ba1a1a;
+            --bg-light: #f3f3f3;
+            --text-main: #111111;
+            --card-border: #d5d9d9;
+            --success-color: #007600;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Amazon Ember', 'Segoe UI', Inter, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar Navigation Layout */
+        #sidebar {
+            width: 350px; background-color: var(--primary-color); color: white;
+            padding: 25px 20px; display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.15); z-index: 10;
+        }
+        #sidebar h2 { font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; }
+        #sidebar h2 span { color: var(--secondary-color); }
+
+        .global-progress-bar-container {
+            background: rgba(255,255,255,0.1); border-radius: 10px; width: 100%; height: 8px;
+            margin-bottom: 25px; overflow: hidden;
+        }
+        .global-progress-fill { background: var(--secondary-color); width: 0%; height: 100%; transition: width 0.4s ease; }
+
+        .day-btn {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0; text-align: left; padding: 15px; font-size: 0.95rem; cursor: pointer;
+            border-radius: 6px; transition: all 0.25s ease-in-out; font-weight: 500;
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%;
+        }
+        .day-btn:hover, .day-btn.active {
+            background-color: var(--accent-color); color: white;
+            box-shadow: 0 4px 10px rgba(20, 110, 180, 0.3); transform: translateX(4px);
+        }
+        .day-btn.locked {
+            background-color: #1a2531 !important; color: #4b5563 !important;
+            cursor: not-allowed !important; transform: none !important; border: 1px dashed #374151;
+        }
+
+        .badge-percent { font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; color: #cbd5e1; }
+
+        /* Viewport Framework */
+        #main-viewport { flex: 1; padding: 40px; overflow-y: auto; scroll-behavior: smooth; }
+        .day-section { display: none; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); max-width: 1200px; margin: 0 auto 50px auto; border: 1px solid var(--card-border); }
+        .day-section.active { display: block; }
+
+        h1 { color: var(--primary-color); font-size: 2.1rem; margin-bottom: 5px; }
+        h2.section-subtitle { color: var(--accent-color); margin-bottom: 25px; font-weight: 400; font-size: 1.15rem; }
+        h3.subsection-title { color: var(--primary-color); margin: 40px 0 20px 0; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; font-size: 1.4rem; }
+
+        .instruction-banner { background-color: #f7f9fa; border-left: 5px solid var(--secondary-color); padding: 20px; border-radius: 6px; margin-bottom: 35px; border-top: 1px solid var(--card-border); border-right: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); }
+        .instruction-banner h4 { color: var(--primary-color); font-size: 1.05rem; margin-bottom: 5px; }
+
+        /* Item Render Styling */
+        .drill-item, .case-item, .static-case-item {
+            background: #ffffff; border: 1px solid var(--card-border); border-left: 5px solid var(--primary-color);
+            padding: 30px; margin-bottom: 35px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.01);
+        }
+        .drill-item.completed, .case-item.completed, .static-case-item.completed { border-left-color: var(--success-color); background-color: #f6fff6; }
+        
+        .drill-text, .case-text { font-size: 1.02rem; line-height: 1.8; margin-bottom: 20px; text-align: justify; color: #111111; white-space: pre-line; }
+        .static-solution-block { background-color: #f6fff6; border: 1px solid #a2e0a2; padding: 20px; border-radius: 6px; margin-top: 15px; font-size: 0.98rem; line-height: 1.6; }
+        .static-solution-block strong { color: var(--success-color); }
+
+        textarea.solution-box { width: 100%; height: 160px; padding: 15px; border: 1px solid #a6a9a9; border-radius: 6px; font-size: 1rem; resize: vertical; margin-bottom: 15px; background-color: #fcfcfc; }
+        textarea.solution-box:focus { outline: none; border-color: var(--secondary-color); background-color: #fff; box-shadow: 0 0 3px 2px rgba(227,150,0,0.3); }
+
+        .submit-item-btn { background-color: #f0c14b; border: 1px solid #a88734; color: #111; padding: 12px 25px; border-radius: 3px; font-weight: 500; cursor: pointer; font-size: 0.95rem; transition: background 0.2s; }
+        .submit-item-btn:hover { background-color: #eeb933; border-color: #9c7e31; }
+        .submit-item-btn.done { background-color: #dee1e1; border-color: #adb1b1; color: #555; cursor: default; }
+
+        /* Proctored Exam Modals & Overlay */
+        #exam-instructions-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); z-index: 99998; justify-content: center; align-items: center; padding: 20px; }
+        .instructions-modal-content { background: white; padding: 40px; border-radius: 12px; max-width: 700px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+        #secure-exam-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 99999; padding: 50px; overflow-y: auto; }
+        #exam-camera-widget { position: fixed; top: 30px; right: 30px; width: 180px; height: 135px; background: #111827; border: 3px solid var(--danger-color); border-radius: 8px; overflow: hidden; color: #ef4444; font-size: 11px; font-weight: bold; text-align: center; }
+        .cam-feed-simulation { width: 100%; height: 110px; background: radial-gradient(circle, #374151 10%, #111827 90%); display: flex; align-items: center; justify-content: center; }
+        .exam-question-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 35px; margin-bottom: 40px; border-radius: 8px; }
+        .exam-question-text { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; color: var(--primary-color); font-weight: 600; }
+        .exam-option-wrapper { display: block; background: white; border: 1px solid #cbd5e1; padding: 20px; margin-bottom: 15px; border-radius: 6px; cursor: pointer; line-height: 1.7; font-size: 1rem; }
+        #cheat-lockout-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f172a; color: white; z-index: 1000000; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+        
+        .reset-progress-btn {
+            background: transparent; border: 1px dashed rgba(255, 255, 255, 0.2); color: #94a3b8;
+            padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin-top: auto;
+            text-align: center; transition: all 0.2s ease;
+        }
+        .reset-progress-btn:hover { background: rgba(186, 26, 26, 0.15); color: #fca5a5; border-color: var(--danger-color); }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div>
+            <h2>Amazon <span>Product Associate </span></h2>
+            <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:5px;">Overall Qualification Progress</p>
+            <div class="global-progress-bar-container">
+                <div class="global-progress-fill" id="master-progress-bar"></div>
+            </div>
+        </div>
+        <button class="day-btn active" id="btn-day1" onclick="navigateToSection('day1-section')">Day 1: Catalog Policy & Tools <span class="badge-percent" id="badge-day1">0%</span></button>
+        <button class="day-btn" id="btn-day2" onclick="navigateToSection('day2-section')">Day 2: 25 Compliance Drills <span class="badge-percent" id="badge-day2">0%</span></button>
+        <button class="day-btn" id="btn-day3" onclick="navigateToSection('day3-section')">Day 3: 25 Advanced Remediation <span class="badge-percent" id="badge-day3">0%</span></button>
+        <button class="day-btn" id="btn-day4" onclick="navigateToSection('day4-section')">Day 4: 20 Brand Integrity Cases <span class="badge-percent" id="badge-day4">0%</span></button>
+        <button class="day-btn locked" id="btn-day5" onclick="triggerExamLaunchSequence()" disabled>Day 5: Final Proctored Certification 🔐</button>
+        
+        <button class="reset-progress-btn" onclick="clearSavedProgress()">Reset Training Progress</button>
+    </div>
+
+    <div id="main-viewport">
+        <!-- DAY 1 SECTION -->
+        <div id="day1-section" class="day-section active">
+            <h1>Day 1: Catalog Integrity, Regulatory Policy & ASIN Lifecycle Mechanics</h1>
+            <h2 class="section-subtitle">Amazon Leadership Principles, 20 Catalog Case Overviews, and 25 Intensive Quality Diagnostics</h2>
+            
+            <div class="instruction-banner">
+                <h4>📋 Day 1 Multi-Part Instructions</h4>
+                <p>Review the foundational Amazon Retail operational overview below. You must systematically analyze the 20 Catalog Integrity case modules by marking them as read, and input unique tool actions/resolutions for all 25 operational drills to satisfy Day 1 verification thresholds.</p>
+            </div>
+
+            <div class="theory-block" style="font-size: 1.02rem; line-height: 1.8; margin-bottom: 35px; text-align: justify;">
+                <p>As an <strong>Amazon Product Associate (PA)</strong>, your primary mandate is to protect the customer experience and maintain catalog health at scale. Managing Amazon's global catalog requires absolute obsession over details, rapid classification accuracy, and a deep understanding of regulatory compliance, variation policy, restricted products framework, and intellectual property guidelines. When anomalies are surfaced through automation pipelines or ticketing flows, PAs must systematically diagnose whether failures are driven by malicious seller manipulation (e.g., detail page hijacking, variation abuse), retail feed technical corruption, or brand registry enforcement actions. Operating with a high degree of Customer Obsession and Bias for Action ensures Amazon remains the earth's most trusted marketplace.</p>
+            </div>
+
+            <h3 class="subsection-title">Part A: Catalog Integrity Production Case Studies (20 Distinct Scenarios)</h3>
+            <div id="day1-cases-bin"></div>
+
+            <h3 class="subsection-title">Part B: Core Listing Quality Drills (25 High-Density Scenarios)</h3>
+            <div id="day1-drills-bin"></div>
+        </div>
+
+        <!-- DAY 2 SECTION -->
+        <div id="day2-section" class="day-section">
+            <h1>Day 2: Core Catalog Compliance & Auditing Drills</h1>
+            <h2 class="section-subtitle">25 High-Density, Unique Marketplace Violation & Listing Defect Simulations</h2>
+            <div class="instruction-banner">
+                <h4>📋 Day 2 Instructions</h4>
+                <p>Day 2 focuses entirely on tactical alert and policy remediation. Below are 25 distinct catalog error payloads, seller ticket escalations, and listing audits. Provide your targeted tool execution and data correction workflows within each panel and submit.</p>
+            </div>
+            <div id="day2-drills-bin"></div>
+        </div>
+
+        <!-- DAY 3 SECTION -->
+        <div id="day3-section" class="day-section">
+            <h1>Day 3: Advanced Brand Integrity & Multi-ASIN Remediation Drills</h1>
+            <h2 class="section-subtitle">25 Advanced Scenarios Involving Variations, Counterfeit Vectors, and Restricted Items</h2>
+            <div class="instruction-banner">
+                <h4>📋 Day 3 Instructions</h4>
+                <p>Day 3 shifts focus to complex seller abuse patterns, brand protection matrices, and structural data anomalies across global marketplaces. Review each scenario, determine the correct mitigation path, and execute validation submissions.</p>
+            </div>
+            <div id="day3-drills-bin"></div>
+        </div>
+
+        <!-- DAY 4 SECTION -->
+        <div id="day4-section" class="day-section">
+            <h1>Day 4: Strategic Catalog Architecture & Risk Escalation Cases</h1>
+            <h2 class="section-subtitle">20 Complex Cross-Marketplace Contaminations, GL String Migrations, and Systemic Glitch Mitigation</h2>
+            <div class="instruction-banner">
+                <h4>📋 Day 4 Instructions</h4>
+                <p>Day 4 represents your final simulation pipeline before certification. Review all 20 complex, high-risk cases involving global listings, massive pricing errors, brand registry takedowns, and feed overrides. Design comprehensive cross-functional programmatic fixes to resolve the anomalies permanently.</p>
+            </div>
+            <div id="day4-cases-bin"></div>
+        </div>
+    </div>
+
+    <!-- DAY 5 MODAL -->
+    <div id="exam-instructions-modal">
+        <div class="instructions-modal-content">
+            <h3 style="color:var(--primary-color); font-size:1.5rem; margin-bottom:15px;">⚠️ Proctored Certification Assessment Directive</h3>
+            <p>You have unlocked the Day 5 Final Product Associate Competency Exam. Review the following security boundaries:</p>
+            <ul style="margin: 20px 0; padding-left: 20px; line-height: 1.8;">
+                <li>The assessment workspace will transition strictly into <strong>Full Screen Window Mode</strong>.</li>
+                <li>A live simulated biometric proctor tracking widget will anchor onto the top right corner.</li>
+                <li><strong>Anti-Cheat System:</strong> Changing browser tabs, minimizing windows, taking screenshots, or losing browser frame focus will instantly trigger a security lock and invalidate your testing instance.</li>
+                <li>The passing threshold is <strong>80%</strong>. Failing will dynamically shift your question set.</li>
+            </ul>
+            <button class="submit-item-btn" style="width:100%; background: var(--danger-color); border: 1px solid #7a1111; color: white; padding:15px; font-weight: bold;" onclick="launchProctoredExamViewport()">Acknowledge & Launch Secure Exam</button>
+        </div>
+    </div>
+
+    <!-- SECURE EXAM OVERLAY -->
+    <div id="secure-exam-overlay">
+        <div id="exam-camera-widget"><div class="cam-feed-simulation" style="color:#ff4d4d; line-height:110px;">🔴 PROCTOR LIVE</div><span>AI PROCTOR MODALITY ACTIVE</span></div>
+        <div style="max-width: 900px; margin: 0 auto; padding-bottom: 120px;">
+            <h1>Day 5: Final Proctored Certification Assessment</h1>
+            <p style="color: var(--danger-color); font-weight: bold; margin-bottom: 30px;">🚨 PROCTOR SECURITY LOCKDOWN: Active session monitoring enabled. Do not navigate away from this viewport.</p>
+            <form id="proctored-exam-form"></form>
+            <button class="submit-item-btn" style="width: 100%; padding: 20px; font-size: 1.2rem; background-color: var(--primary-color); color: white; border-color: #111;" onclick="evaluateExamSubmission()">Submit Final Examination</button>
+        </div>
+    </div>
+
+    <!-- LOCKOUT SCREEN -->
+    <div id="cheat-lockout-screen">
+        <h1 style="color:var(--danger-color); font-size:3rem; margin-bottom:20px;">ASSESSMENT TERMINATED</h1>
+        <p style="max-width:600px; color:#94a3b8; line-height:1.6;">A security integrity framework exception was thrown (Tab out / Frame Focus Lost detected). The evaluation engine has recorded this instance. The operations leadership team has been notified.</p>
+    </div>
+
+    <script>
+        const STORAGE_STATE_KEY = "amazon_pa_tracking_state_v3";
+        const STORAGE_TEXT_KEY = "amazon_pa_text_inputs_v3";
+        const STORAGE_TAB_KEY = "amazon_pa_active_tab_v3";
+
+        let moduleTrackingState = {
+            day1_cases: new Array(20).fill(false),
+            day1_drills: new Array(25).fill(false),
+            day2: new Array(25).fill(false),
+            day3: new Array(25).fill(false),
+            day4: new Array(20).fill(false)
+        };
+
+        let textInputsState = {};
+
+        // ==================== 100% EXPLICIT NON-REPEATING DATA REPOSITORY ====================
+
+        // --- DAY 1: 20 CASE STUDIES ---
+        const d1CasesData = [
+            { text: "[CATALOG INTEGRITY CASE STUDY #1: Detail Page Hijacking via Vendor Central Feed Override]\nA high-severity defect notification was triggered in marketplace systems. Investigation confirms that an entity altered critical catalog attributes for ASIN B00X1001FF, disrupting detail page integrity. This anomaly caused downstream operational delays across customer support channels, generating an 18% spike in negative customer contacts within 4 hours. Audit logs indicate that attribute ownership overrides took precedence despite explicit brand registry enrollment parameters.", solution: "EXECUTION NOTE: Lock down the attribute ownership (Contribution Score) to Brand Registry authority. Revert the corrupted listing attributes via standard inventory synchronization protocols and notify the Partner Enforcement Team to log a policy violation against the abusive seller token." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #2: Parent-Child Variation Abuse (ASIN Twisting for Reviews)]\nAt 08:40 UTC, an automated sweep identified a parent-child relationship anomaly on ASIN B00X1002FF. A malicious merchant attached completely unrelated accessories (cell phone cases) as color variations to a high-ranking electronics parent listing to siphon its positive review matrix. Traffic analytics registered an immediate drop in conversion consistency across valid child variants, confusing consumer purchasing pipelines.", solution: "EXECUTION NOTE: Sever the invalid variation paths by dismantling the parent shell node. Isolate the offending child contributions, scrub the review association pointers, and forward the merchant identity to the Abuse Remediation Panel for account-level strike evaluation." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #3: Restricted Products Infringement via Ingredient Concealment]\nA routine search filter discovered a premium dietary supplement ASIN B00X1003FF utilizing localized character bypass strings to dodge restricted ingredient detection algorithms. The listing detail description used lookalike cyrillic symbols to insert a prescription-only organic compound. Customer health safety dashboards registered high-risk tracking flags from external pharmacy compliance auditors.", solution: "EXECUTION NOTE: Initiate an immediate hard suppression on the catalog listing. Scrub the indexing keywords across all active locales, issue a product removal notice to Fulfillment Centers holding stock, and tag the seller account with an unappealable restricted items strike." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #4: Brand Registry Counterfeit Claim Flapping Loop]\nBrand tracking infrastructure encountered a systemic loop defect where an authorized distributor was recursively blocked by automated counterfeit claims initiated by an automated Brand Registry software rule for ASIN B00X1004FF. The seller token possessed valid wholesale documentation, but the system repeatedly matched their inventory feed against unauthorized distribution lists.", solution: "EXECUTION NOTE: Apply an explicit whitelisting override flag to the distributor's merchant token for this specific brand node. Clear the active listing suppression block, sync backend inventory data, and refine the brand's automated matching logic heuristics." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #5: Hazardous Materials (Hazmat) Battery Classification Defect]\nDuring an inbound intake sweep at an fulfillment center, ASIN B00X1005FF was found to contain heavy lithium-ion elements, despite being listed as an un-powered mechanical device in the catalog data. The product page description was modified by an external seller feed to bypass safety disclosure documents required by transit regulations.", solution: "EXECUTION NOTE: Implement an immediate warehouse move block to contain affected inventory pools. Transition the ASIN catalog GL class to Hazardous Materials, require the submission of complete UN38.3 test summaries, and suppress the detail page until legal validation succeeds." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #6: Global GL String Misclassification Ingestion Fault]\nA bulk catalog update pipeline mistakenly processed a batch of automotive heavy parts as grocery items under ASIN B00X1006FF. This error bypassed safety restrictions, exposing inappropriate industrial products to prime-day home filters, generating severe browsing layout failures and indexing corruptions across regional mobile channels.", solution: "EXECUTION NOTE: Force an explicit General Product Type (GL String) reassignment via the Category Extraction Tool. Re-index the ASIN node directly to the Automotive hierarchy, flush regional caching layers, and invalidate the corrupted seller flat-file payload." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #7: High-Volume Duplicate ASIN Creation via Flat-File Ingestion]\nA seller token utilized modified UPC prefixes to bypass duplication checkers, introducing over 4,000 duplicate detail pages for a single generic household item (Base ASIN B00X1007FF). This volume clogged internal search architecture indexes, resulting in fragmented pricing models and messy customer browsing paths.", solution: "EXECUTION NOTE: Deploy the ASIN Merging Utility to consolidate duplicate children entries into a single target generic canonical page. Flag the modified UPC variations, invalidate the vendor's listing privileges for that batch partition, and clean the downstream product search indices." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #8: Trademark Infringement via Title Keyword Stuffing]\nAn audit of trending keyword matrices revealed that ASIN B00X1008FF included protected premium brand names inside its hidden backend keywords and front-facing description text to hijack search volumes. Brand Registry tracking platforms registered a direct infringement violation, causing an executive escalation.", solution: "EXECUTION NOTE: Execute a title text cleanup and completely purge the infringing keyword blocks from the catalog data database backend. Lower the seller's contribution ranking score, restore the canonical brand profile layout, and notify the legal validation queue." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #9: Pricing Error Loop Triggered by Currency Conversions]\nDuring an international catalog syndication sweep between NA and MX marketplaces, a misplaced decimal point in currency exchange mappings caused ASIN B00X1009FF to be offered at $1.50 instead of $150.00. High-frequency consumer scrapers placed 12,000 orders within minutes, triggering massive cross-docking bottlenecks.", solution: "EXECUTION NOTE: Force a temporary price-lock suppression across all affected marketplace nodes. Cancel unfulfilled pending transactions in the order pipeline due to data error parameters, correct exchange rate algorithms, and unlock the listing page safely." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #10: Product Safety Recall Regulatory Escalation]\nA government agency issued an emergency recall notice regarding a choking hazard found in a specific batch of toys related to ASIN B00X1010FF. The product was still active across secondary liquidator merchant tokens within third-party seller networks, violating marketplace safety mandates.", solution: "EXECUTION NOTE: Execute a universal global catalog suppression for the ASIN and all known variations. Move all inventory within fulfillment facilities to un-sellable quarantine zones, issue mandatory recall notices to purchasers, and close the listing permanently." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #11: Parallel Import Gray Market Verification Failure]\nAn international retail entity imported regional versions of a premium electronic device (ASIN B00X1011FF) into a territory where it lacked regulatory warranty clearance. The listing layout claimed native local warranty support, violating regional consumer protection laws.", solution: "EXECUTION NOTE: Append a clear country-of-origin warning flag to the product page attributes. Remove unauthorized local warranty text fields submitted by the parallel importer, and restrict sales access lines to certified merchant entities." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #12: Image Link Hijacking via Legacy Feed Vulnerability]\nA legacy software bridge permitted an expired vendor token to overwrite the main images for high-traffic apparel listings (ASIN B00X1012FF) with spam graphics. Internal image moderation queues failed to catch the update due to high batch workloads, resulting in a degraded homepage display.", solution: "EXECUTION NOTE: Revert asset pointers back to verified historical brand images stored in storage repositories. Disable the legacy vendor feed ingestion node completely and assign strict write-access rules to authenticated active brand owners." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #13: Exclusivity Agreement Breach by Unauthorized Reselling Network]\nA premium luxury brand identified a cluster of unverified merchant profiles selling controlled luxury cosmetics under ASIN B00X1013FF. The product page data was altered to remove anti-tampering lot traceability numbers from product description images.", solution: "EXECUTION NOTE: Restrict listing assignment parameters to Brand Authorized Tier-1 vendors only. Remove all tampered product listings from the public marketplace page and issue policy compliance warnings to the offending seller accounts." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #14: ASIN Merging Glitch Corrupting Historical Reviews]\nA catalog merge utility combined two completely separate iterations of a hardware tool under ASIN B00X1014FF. This combined user feedback profiles for an older reliable model with a newer defective redesign, leading to skewed customer expectations and rising return rates.", solution: "EXECUTION NOTE: Reverse the catalog merge by creating separate canonical database entities for both product models. Separate historical user reviews using the transaction logging table timestamps, and re-index both product descriptions." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #15: Review Manipulation Injection Through Compromised Accounts]\nA cluster of newly registered buyer accounts flooded ASIN B00X1015FF with thousands of unverified 5-star reviews within a 20-minute window. Monitoring tools detected abnormal request patterns coming from a single IP network hub, suggesting artificial rank manipulation.", solution: "EXECUTION NOTE: Apply a review block to the ASIN detail page immediately. Wipe the artificial review cluster from the database, lower the visibility index ranking of the listing, and escalate the case to the Risk Enforcement Team." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #16: Expired Inventory Systematic Listing Hold Trigger]\nPerishable food products under ASIN B00X1016FF triggered high customer complaint flags due to receiving expired shipments. The catalog profile lacked an explicitly defined product expiration tracking flag, bypassing normal fulfillment center automated expiration sweeps.", solution: "EXECUTION NOTE: Update the catalog definition metadata schema to require an explicit expiration date entry during inventory ingestion. Put the listing page on a temporary hold until fulfillment centers verify active date values across stock bins." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #17: Search Index Suppression due to Bullet Point Formatting Errors]\nA seller used extensive HTML coding and prohibited promotional terms inside the catalog description fields for ASIN B00X1017FF. This formatting broke mobile rendering templates, causing the search indexing engine to automatically suppress the listing from all search inquiries.", solution: "EXECUTION NOTE: Strip out all non-standard HTML styling tags from the listing backend text fields. Update the detail description layout to use plain text formatting that aligns with style guide criteria, and trigger an immediate search index re-crawl." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #18: Product Weight and Metric Mismatches Breaking FBA Fees]\nA seller modified the product package dimension fields for heavy item ASIN B00X1018FF, changing pounds to ounces to artificially lower their fulfillment fees. This manipulation caused systemic issues with weight checkers inside automated cross-docking sorting facilities.", solution: "EXECUTION NOTE: Flag the ASIN for a physical measurement check (Cubiscan verification) at the nearest fulfillment location. Lock the verified package dimension variables against future unauthorized alterations, and charge the seller's account for unpaid historical fee balances." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #19: Counterfeit Risk Sweep Blocking Legitimate Brand Ingestion]\nAn over-aggressive security automation script flagged a verified brand launch under ASIN B00X1019FF as a high-risk counterfeit vector, immediately suppressing the new seasonal catalog selection. The brand owner could not access their administrative dashboard due to the security hold.", solution: "EXECUTION NOTE: Review the brand's legal documentation and trade certificates manually. Revoke the automated safety block, restore full marketplace catalog functionality to the listing, and calibrate the automated detection rules to minimize future false positives." },
+            { text: "[CATALOG INTEGRITY CASE STUDY #20: Pesticide Device False Positive Flag on Plant-Based Material]\nNatural fiber apparel items under ASIN B00X1020FF were flagged as illegal pesticide devices by compliance classifiers because the title contained the descriptive keyword 'insect-resistant'. The seller's access lines were blocked due to a lack of regulatory licensing documentation.", solution: "EXECUTION NOTE: Review the actual product attributes to verify it is an ordinary textile item rather than an active chemical agent. Remove the misleading terminology from search indexes, clear the pesticide device flag, and restore listing visibility." }
+        ];
+
+        // --- DAY 1: 25 CORE DIAGNOSTIC DRILLS ---
+        const d1DrillsData = [
+            { text: "[CORE DIAGNOSTIC DRILL #1.1: Catalog Attribute Inspection Verification]\nSystem Alert: ASIN B01A2001ZZ is reporting conflicting Product Type codes. The seller-submitted feed asserts 'HOME_GOODS', whereas automatic vision algorithms flag the item image as 'DIETARY_SUPPLEMENT'. A critical policy deviation exists.\nTask: Review internal metadata logs, evaluate classification risks, and specify which automated tool corrects the validation code." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.2: UPC Validation Mismatch Check]\nSystem Alert: ASIN B01A2002ZZ uses a registered UPC prefix assigned to a food manufacturing conglomerate, but the listing title text describes a plastic automotive replacement bumper.\nTask: Identify the accurate tool hierarchy path within GS1 registration databases to re-verify compliance parameters." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.3: Bullet Point Character Injection Clean]\nSystem Alert: ASIN B01A2003ZZ contains hidden non-ASCII Unicode strings hidden within description lines. These characters are breaking index queries across regional warehouse pick-and-pack machines.\nTask: Describe the exact text sanitization process and technical tool panel necessary to clear raw string data arrays." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.4: Brand Inconsistency Error Remediation]\nSystem Alert: ASIN B01A2004ZZ lists 'Generic' in the structural brand metadata block while simultaneously rendering high-resolution watermarked 'Sony' logos in the public media loop gallery.\nTask: Formulate the correct contribution hierarchy correction rule to eliminate public catalog confusion." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.5: Parent Hierarchy Link Loss Triage]\nSystem Alert: Child ASIN B01A2005ZZ has dropped from its parental indexing tree entirely because of an invalid variation theme assignment ('Size-Color' mismatches 'Flavor').\nTask: State the required process inside the Inventory Flat-File Template system to reconnect orphaned child listing nodes." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.6: Inbound Country-of-Origin Validation Failure]\nSystem Alert: ASIN B01A2006ZZ is flagged at customs checkpoints. The catalog data lists 'US' production, but physical shipping container documents identify manufacturing origins in 'CN'.\nTask: Detail how to force an attribute rewrite on the global logistics string using high-priority administrative overrides." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.7: Over-Sized Package Dimension Discrepancy]\nSystem Alert: The seller flat-file claims a structural product height of 4 inches for ASIN B01A2007ZZ, but automated warehouse conveyor scanners reject the box as an over-sized 45-inch profile.\nTask: Select the inventory tool pipeline needed to issue a physical volume verification hold (Cubiscan Request Process)." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.8: Part Number Ingestion Scrape Collision]\nSystem Alert: Vendor Central bulk uploads for ASIN B01A2008ZZ failed because the manufacturer part number matches an unrelated registered listing in an entirely separate GL product line.\nTask: Explain the step sequence to execute an item separation action using the Catalog Part Allocation Tool." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.9: EAN Checksum Structural Corruptions]\nSystem Alert: A seller input an illegal 13-digit sequence ending in an impossible mathematically incorrect checksum value for ASIN B01A2009ZZ, bypassing basic feed intake validators.\nTask: Document the mandatory procedure to purge the structurally flawed product record from global active index storage trees." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.10: Main Image Aspect Ratio Rejection]\nSystem Alert: ASIN B01A2010ZZ is throwing automatic media processing rejections because its uploaded listing graphic has an aspect ratio of 1:4 with non-white lifestyle backdrops.\nTask: Define the exact moderation workflow needed to apply placeholder catalog banners while notifying the seller." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.11: Restricted Medical Text Extraction Alert]\nSystem Alert: Natural language processing systems identified the phrase 'cure active infections' on ASIN B01A2011ZZ, which is an unapproved cosmetic moisturizer listing.\nTask: Map out the required technical path inside the Listing Compliance Editor to target and sanitize high-risk keyword strings." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.12: Dual Parent Mapping Redundancy Audit]\nSystem Alert: Automated crawlers discovered child listing B01A2012ZZ is concurrently tied to two completely distinct active parent structural shells within the same retail node.\nTask: Plan the isolation procedure to dismantle the duplicate parental path without dropping historical customer reviews." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.13: Item Package Quantity Multiplier Inflation]\nSystem Alert: Customer complaints suggest ASIN B01A2013ZZ is advertised as a 'Pack of 12', but the merchant listing data indicates an item count of 1. Shipping scales are reporting shipping discrepancies.\nTask: Identify the exact product attribute field that requires a rigid administrative lock to stabilize order volume units." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.14: Industrial Category Path Misalignment Triage]\nSystem Alert: A high-power laser cutter (ASIN B01A2014ZZ) has been placed under the 'Toys & Games' item classification path, exposing minors to high-voltage equipment pages.\nTask: Detail the immediate escalation path to update the item's operational GL String using the Node Assignment Utility." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.15: Title Structure Length Threshold Violation]\nSystem Alert: The front-facing title for ASIN B01A2015ZZ contains 482 characters, violating the standard 200-character upper threshold limit and introducing severe layout issues on mobile formats.\nTask: Draft a clean, policy-compliant title format utilizing the core brand, model, and physical specification variables." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.16: Duplicate Global Trade Item Number Remediation]\nSystem Alert: Two separate third-party sellers submitted identical GTIN identifiers for completely separate custom items, generating a catalog data collision on ASIN B01A2016ZZ.\nTask: Define the technical criteria used to isolate the authentic product record from the secondary parasitic submission." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.17: Manufacturer Identity Discrepancy Verification]\nSystem Alert: ASIN B01A2017ZZ lists the building entity as 'Logitech' in the title string but maps to 'Generic Manufacturer LLC' in the backend manufacturing data arrays.\nTask: Explain the required steps within the Vendor Contribution Engine to enforce structural alignment between fields." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.18: Item Form Value Mismatch Block]\nSystem Alert: The product detail section for ASIN B01A2018ZZ declares the physical form factor as 'Liquid', but the shipping profile parameters explicitly track the product as 'Solid Powder Pellets'.\nTask: State the impact this metric discrepancy has on dangerous goods safety scanning and outline the resolution procedure." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.19: Expiry Date Indicator Exclusion Check]\nSystem Alert: A perishable dairy culture product (ASIN B01A2019ZZ) was added to the marketplace without setting the 'Is-Expiration-Dated-Product' safety flag to true.\nTask: Describe the corrective adjustments required within the Category Metadata Manager to update this lifecycle variable." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.20: High-Value ASIN Title Hijack Detection]\nSystem Alert: An unverified third-party account altered the title text of high-velocity electronic ASIN B01A2020ZZ to display promotional voucher codes.\nTask: Outline the mitigation steps to block unauthorized contributions using the Brand Registry Protection Platform." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.21: Dangerous Goods Shipping Weight Validation]\nSystem Alert: The catalog weight value for chemical item ASIN B01A2021ZZ was modified down to 0.01 lbs, conflicting with the known safety profile weight of 18.5 lbs.\nTask: Determine the operational tool path needed to secure the product data profile against weight field changes." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.22: Model Number Field Mismatch Clean]\nSystem Alert: An automated audit flagged a mismatch on ASIN B01A2022ZZ. The item description text details model 'MK-500', but the model attribute field lists 'MK-100'.\nTask: Explain the correct workflow to re-verify the true manufacturing model using verified product image documentation." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.23: Hidden HTML Character Tag Cleansing]\nSystem Alert: The descriptive layout of ASIN B01A2023ZZ contains embedded JavaScript logic strings inside the product summary block, which presents a security vulnerability.\nTask: Detail the specific data validation steps required to strip out all non-supported layout markup tags." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.24: Multi-Language Marketplace Feed Contamination]\nSystem Alert: The localized Spanish storefront page for ASIN B01A2024ZZ is rendering Japanese character descriptions due to a multi-channel translation processing failure.\nTask: Walk through the process to flush the regional caching layer and force a localized data reload." },
+            { text: "[CORE DIAGNOSTIC DRILL #1.25: Missing Product Safety Warnings Audit]\nSystem Alert: ASIN B01A2025ZZ includes a high-powered magnet kit, but the catalog listing page lacks the mandatory legal choking and ingestion risk warnings.\nTask: Detail how to use the Regulatory Compliance Injection Panel to apply the required hazard warnings." }
+        ];
+
+        // --- DAY 2: 25 COMPLIANCE & AUDITING DRILLS ---
+        const d2DrillsData = [
+            { text: "[COMPLIANCE DRILL #2.1: Listing Policy Audit and Enforcement Execution]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [WARNING] Seller Token T-4001X submitted product content violating Restricted Products Guidelines on ASIN B02B3001YY.\nListing Data: \"Contains active pharmaceutical compounds flagged under Schedule 1 compliance restrictions.\"\nTask: Define your enforcement action. Specify whether you will suppress the ASIN, flag the account, or initiate an inventory removal request for FBA items.", },
+            { text: "[COMPLIANCE DRILL #2.2: Counterfeit Apparel Pattern Investigation]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [CRITICAL] Brand protection alerts flagged ASIN B02B3002YY for including trademarked designer patterns on generic unbranded canvas shoes.\nListing Data: \"Luxury pattern leather fashion sneaker.\"\nTask: Outline the investigation workflow. Detail the documentation required from the seller to avoid full listing termination.", },
+            { text: "[COMPLIANCE DRILL #2.3: Age-Restricted Device Classification Escape]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [RESTRICTED] ASIN B02B3003YY was identified bypassing age verification check-walls by being listed under 'Health & Household Utilities'.\nListing Data: \"Electronic aromatherapy vapor pen system.\"\nTask: Identify the tools required to migrate the product records into the appropriate age-gated browse category.", },
+            { text: "[COMPLIANCE DRILL #2.4: Medical Laser Device Power Output Audit]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [SAFETY] Automated specification analysis indicates ASIN B02B3004YY advertises an output power exceeding 5mW, violating consumer safety ceilings.\nListing Data: \"High-intensity laser tool for tactical pointer setups.\"\nTask: Detail the immediate compliance isolation steps required to handle high-risk retail items.", },
+            { text: "[COMPLIANCE DRILL #2.5: Unapproved Insecticide Claims Suppressing]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [REGULATORY] ASIN B02B3005YY contains explicit insecticide protection claims without an official EPA registration number link.\nListing Data: \"All-natural organic oil spray completely eradicates structural lawn pests permanently.\"\nTask: Explain how to process a regulatory-driven product suppression flag inside the Compliance Admin panel.", },
+            { text: "[COMPLIANCE DRILL #2.6: Infant Choking Hazard Material Screening]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [SAFETY] High return-rate keywords for ASIN B02B3006YY indicate small loose components detaching during normal use.\nListing Data: \"Plush rattle set designed for infants aged 0-3 months.\"\nTask: Formulate an emergency warehouse stock hold request plan and detail the automated safety review procedures.", },
+            { text: "[COMPLIANCE DRILL #2.7: Unauthorized Wireless Frequency Broadcaster Audit]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [REGULATORY] Radio transmission scanner flags ASIN B02B3007YY operating on cellular communications bands restricted by national communications frameworks.\nListing Data: \"Long-range wireless remote control transmitter kit.\"\nTask: Define the documentation validation steps needed to check the FCC identification certificates submitted by the vendor.", },
+            { text: "[COMPLIANCE DRILL #2.8: False Organic Food Certification Claims]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [FRAUD] Food safety automated triggers flag ASIN B02B3008YY for displaying certification emblems without valid supporting license numbers.\nListing Data: \"Certified 100% Organic Raw Forest Honey.\"\nTask: State the verification process required to check third-party agricultural data registries for compliance confirmation.", },
+            { text: "[COMPLIANCE DRILL #2.9: Prescription Medication Gray Market Ingestion]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [ILLEGAL] ASIN B02B3009YY contains an active ingredient structurally identical to a controlled medication that requires an official medical prescription.\nListing Data: \"Extra-strength therapeutic hair regrowth topical solution.\"\nTask: Design the database mitigation workflow to lock out all third-party merchant offers globally for the affected ASIN.", },
+            { text: "[COMPLIANCE DRILL #2.10: Dietary Supplement Heavy Metal Contamination Escalation]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [HEALTH_HAZARD] Third-party laboratory findings suggest that batches under ASIN B02B3010YY contain heavy metal quantities above acceptable safe thresholds.\nListing Data: \"Pure herbal extract powder for daily wellness.\"\nTask: Outline the process to issue immediate safety recall notices across the customer order database history.", },
+            { text: "[COMPLIANCE DRILL #2.11: Restricted Military Item Catalog Identification]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [SECURITY] ASIN B02B3011YY contains product specifications matching controlled tactical gear restricted from international export pipelines.\nListing Data: \"Advanced night vision optical goggles with infrared mounting systems.\"\nTask: Specify the precise security flags to implement within the global export restriction matrix.", },
+            { text: "[COMPLIANCE DRILL #2.12: Dangerous Corrosive Chemical Package Leak Risk]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [HAZMAT] Materials log profiles indicate ASIN B02B3012YY features an un-bonded acid compound that requires specialized transport packaging.\nListing Data: \"Industrial-strength concrete etching cleaning solution.\"\nTask: Detail the specific logistics class reassignment steps required to transition the item to special Hazmat storage facilities.", },
+            { text: "[COMPLIANCE DRILL #2.13: Illegal Software License Distribution Interception]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [IP_VIOLATION] Digital tracking routines flag ASIN B02B3013YY for attempting to distribute OEM operating system keys via physical media sheets.\nListing Data: \"Genuine operating system activation card with product key.\"\nTask: Outline the investigation steps to confirm intellectual property licensing authority for the merchant token.", },
+            { text: "[COMPLIANCE DRILL #2.14: Tobacco Substitute Product Policy Workaround]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [POLICY_BYPASS] ASIN B02B3014YY uses misleading creative descriptions to mask the listing of tobacco alternative consumables.\nListing Data: \"Herbal molasses shisha flavor blocks - 100% nicotine free smoke.\"\nTask: Identify the keyword filter adjustment steps required to close policy avoidance loopholes.", },
+            { text: "[COMPLIANCE DRILL #2.15: Counterfeit Automotive Brake Pad Material Detection]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [CRITICAL_SAFETY] Original Equipment Manufacturers flagged ASIN B02B3015YY for distributing lookalike brake pads fabricated from low-grade compressed compound alternatives.\nListing Data: \"OEM replacement front ceramic brake discs.\"\nTask: Map out the execution process to clear unverified stock from logistics pipelines using inventory suppression controls.", },
+            { text: "[COMPLIANCE DRILL #2.16: False Energy Efficiency Star Metric Injection]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [MISLEADING] Consumer protection monitors identified that ASIN B02B3016YY lists an incorrect Energy Star rating badge without environmental agency approval documentation.\nListing Data: \"Ultra-efficient cooling unit for home spaces.\"\nTask: Detail how to use the Detail Page Content Sanitizer tool to remove unverified environmental claims.", },
+            { text: "[COMPLIANCE DRILL #2.17: Endangered Wildlife Product Material Audit]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [LEGAL_EXCLUSION] Environmental regulations flagged ASIN B02B3017YY for listing a musical item constructed from protected exotic wood variants.\nListing Data: \"Handcrafted classical guitar featuring rare natural solid tonewood inserts.\"\nTask: Explain the compliance certification validation rules required to clear international trading holds.", },
+            { text: "[COMPLIANCE DRILL #2.18: Flammable Textile Fabric Safety Failures]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [SAFETY] Flammability laboratory evaluations confirm that materials used in ASIN B02B3018YY fail child apparel safety flame-retardant standard tests.\nListing Data: \"Soft flannel matching family winter pajama sets.\"\nTask: Draft the programmatic steps required to implement an absolute purchasing block for the item across the catalog.", },
+            { text: "[COMPLIANCE DRILL #2.19: Unlabeled Alcohol Content Ingestion Risk]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [REGULATORY] Confectionery item review patterns for ASIN B02B3019YY reveal significant un-disclosed liquor contents, violating regional retail trading laws.\nListing Data: \"Artisanal European dark chocolate assorted gift basket.\"\nTask: Detail the classification change process needed to apply accurate ingredient labeling rules.", },
+            { text: "[COMPLIANCE DRILL #2.20: Dangerous Counterfeit Lithium Battery Intercept]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [HAZMAT] Returns processing facilities reported multiple thermal runaway expansion incidents involving camera battery packs under ASIN B02B3020YY.\nListing Data: \"High-capacity rechargeable camera power block.\"\nTask: Formulate the steps to enforce an un-appealable global block on the product and the associated manufacturing entity.", },
+            { text: "[COMPLIANCE DRILL #2.21: Fake Medical Grade Personal Protective Equipment Monitoring]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [SAFETY] Inspection systems flag ASIN B02B3021YY for claiming surgical protection capabilities without containing verified filtration fabric layers.\nListing Data: \"Certified medical-grade high-filtration protective face coverings.\"\nTask: Define the quality checking methods required to audit safety certifications submitted by the merchant.", },
+            { text: "[COMPLIANCE DRILL #2.22: Illegal Surveillance Equipment Disguise Detection]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [LEGAL] Privacy compliance protocols flagged ASIN B02B3022YY for showcasing hidden voice and video capturing elements inside household fixtures.\nListing Data: \"Functional functional wall clock featuring interior smart design extensions.\"\nTask: State the compliance policy criteria used to distinguish legitimate home monitoring options from illegal spy gear.", },
+            { text: "[COMPLIANCE DRILL #2.23: Controlled Explosive Precursor Chemical Check]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [SECURITY] Chemical composition monitoring tools detected that fertilizer item ASIN B02B3023YY possesses concentration levels that are regulated under domestic security laws.\nListing Data: \"High-nitrogen rapid-growth plant fertilizer compound.\"\nTask: Outline the purchasing restriction limits and regulatory monitoring fields to implement for the listing.", },
+            { text: "[COMPLIANCE DRILL #2.24: Unauthorized Financial Instrument Gift Card Sales]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [FINANCIAL] Anti-money laundering tracking routines flag ASIN B02B3024YY for attempting to resell generic activated stored-value credit tokens via merchant accounts.\nListing Data: \"Prepaid payment card loaded with active currency balances.\"\nTask: Define the immediate account hold mechanisms used to stop illegal payment alternative activities.", },
+            { text: "[COMPLIANCE DRILL #2.25: Unsafe Structural Toy Weight Capacity Exaggeration]\nLog Line: [POLICY-ENFORCEMENT-ENGINE] [SAFETY] Engineering test reports suggest that outdoor toy ASIN B02B3025YY breaks at half of its advertised structural load limit, presenting an injury risk.\nListing Data: \"Heavy-duty metal frame backyard swing set supporting up to 400 lbs.\"\nTask: Explain the process to apply a temporary safety suppression lock on the listing page while requesting physical factory test results." }
+        ];
+
+        // --- DAY 3: 25 ADVANCED REMEDIATION DRILLS ---
+        const d3DrillsData = [
+            { text: "[ADVANCED REMEDIATION DRILL #3.1: Brand Protection & Variant Integrity Verification]\nIncident Trace: Multiple child ASINs under Parent ASIN B03M5001PL display asymmetrical item reviews. Cross-referencing reveals that the seller merged invalid variation themes to inflate product review counts artificially.\nTask: Draft your architectural cleanup blueprint. State how you will dismantle the variation family, split the historical review structures, and issue systemic policy strikes to the seller account.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.2: International Trademark Encroachment Across Regional Marketplaces]\nIncident Trace: Brand managers for a global electronics firm reported that ASIN B03M5002PL is utilizing their trademarked name across European storefront variations without commercial authorization.\nTask: Map out the programmatic step sequence required to clear the unauthorized trademark terms from regional search indexes.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.3: Systematic Catalog Hijacking via High-Volume Contribution Overrides]\nIncident Trace: A group of bad actor seller profiles used bulk flat-file uploads to inject unrelated technical metadata into 15 high-velocity listings under parent ASIN B03M5003PL.\nTask: Outline the remediation steps using the Global Contribution Override System to restore historical brand integrity data.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.4: Review Generation Manipulation via Product Inserts]\nIncident Trace: Returns warehouse staff discovered that inventory items for ASIN B03M5004PL contain printed inserts offering cash rewards in exchange for five-star marketplace reviews.\nTask: Define the enforcement process to freeze the merchant's financial balances and apply a review evaluation lock on the product page.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.5: Multi-ASIN Cross-Contamination Glitch Analysis]\nIncident Trace: A system processing failure combined product imagery for kitchen appliances with detail listings for children's bedding across an entire variation group under ASIN B03M5005PL.\nTask: Detail the data troubleshooting steps needed to clear the asset tables and re-index the correct imagery across systems.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.6: Counterfeit Matrix Distribution Network Mapping]\nIncident Trace: Fraud analytics flagged a group of 12 new seller profiles offering identical luxury watches under ASIN B03M5006PL at unrealistic discounts, suggesting organized counterfeit distribution.\nTask: Outline the verification steps to track shared merchant information points and execute a coordinated block across the accounts.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.7: Brand Registry Enrolled Title Override Bypass]\nIncident Trace: An unverified retail feed bypassed Brand Registry protection locks on ASIN B03M5007PL, changing the brand field name to a generic term to avoid automated security checks.\nTask: Walk through the troubleshooting process to repair the listing data and restore ownership privileges to the authentic brand entity.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.8: Fragmented Review Matrix Separation Logic]\nIncident Trace: Administrative tools mistakenly merged a legacy version of a device with a modern redesign under ASIN B03M5008PL, resulting in a confusing mix of user feedback profiles.\nTask: Detail the database splitting steps required to isolate review records using product transaction timestamps.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.9: High-Risk Patent Infringement Takedown Execution]\nIncident Trace: Legal representatives for an engineering firm submitted a confirmed patent infringement injunction against the structural design of ASIN B03M5009PL.\nTask: Specify the immediate suppression actions and inventory holding procedures required to comply with the legal takedown mandate.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.10: Restricted Insect Repellent Category Infringement]\nIncident Trace: ASIN B03M5010PL was added to the catalog under an apparel node but features advanced chemical-treated fabric strands that require regulatory environmental licensing.\nTask: Outline the compliance steps to suppress the listing and require official environmental safety documentation from the merchant.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.11: Malicious Variation Ingestion via Discontinued ASIN Revivals]\nIncident Trace: A seller hijacked a discontinued, highly-rated electronic product listing (ASIN B03M5011PL) and modified its attributes to sell a new line of generic charging adapters.\nTask: Explain the steps to deactivate the modified listing, restore the historical product record, and apply account-level enforcement.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.12: Global Trade Item Number Hijack Recovery]\nIncident Trace: A generic manufacturer registered an active listing for ASIN B03M5012PL using a verified GS1 barcode that belongs to an established consumer goods brand.\nTask: Detail the validation workflow required to verify barcode ownership certificates and release the hijacked GTIN identifier.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.13: Dangerous Liquid Chemical Concentration Mismatch]\nIncident Trace: Quality metrics for industrial cleaning fluid ASIN B03M5013PL indicate active acid concentrations that are double the values permitted by consumer transit regulations.\nTask: Design an immediate warehouse hold and remediation workflow to secure the affected inventory across fulfillment centers.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.14: Brand Authorization Letter Authenticity Audit]\nIncident Trace: A distributor submitted an authorization documentation bundle for ASIN B03M5014PL that features inconsistent corporate logos, suggesting document alteration.\nTask: Walk through the validation steps required to confirm the authenticity of distribution agreements with the brand owner.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.15: ASIN Twisting via Color Variation Misuse]\nIncident Trace: An automated sweep discovered that ASIN B03M5015PL includes a standalone heavy appliance listed as a 'color variant' of a small hand tool to manipulate search ranking visibility.\nTask: Outline the technical steps required to break the incorrect parental relationship and restore proper search category mapping.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.16: Unauthorized Medical Device Distribution Cleanup]\nIncident Trace: Compliance checkers identified that professional-grade diagnostic equipment ASIN B03M5016PL is being sold by uncertified third-party sellers without healthcare license verification.\nTask: Explain how to restrict listing privileges to authorized medical distributors within the catalog system.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.17: Systemic Feed Corruption Breaking Mobile Checkout Layouts]\nIncident Trace: A bad data payload modified the bullet descriptions of 50 listings under parent ASIN B03M5017PL with unclosed HTML code blocks, disrupting mobile application rendering.\nTask: Detail the emergency recovery workflow to strip the broken formatting code and restore clean product descriptions.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.18: False Non-GMO and Dietary Claim Verification]\nIncident Trace: Regulatory compliance monitors flagged grocery item ASIN B03M5018PL for displaying advanced dietary claims without providing verified laboratory certification numbers.\nTask: Outline the validation requirements the seller must meet to retain their listing privileges for the item.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.19: Counterfeit Media and Video Disc Duplication Audit]\nIncident Trace: Rights holders flagged media listing ASIN B03M5019PL for distributing unauthorized optical disc duplicates that infringe on copyright protections.\nTask: Detail the process to remove the infringing product entries and issue a policy enforcement strike to the vendor profile.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.20: High-Risk Industrial Equipment Weight Limit Discrepancy]\nIncident Trace: The catalog description for lifting hoist ASIN B03M5020PL was altered to claim a 10,000 lbs capacity, contradicting the engineering documentation limit of 2,000 lbs.\nTask: Map out the safety correction steps required to lock the accurate capacity metrics against future unauthorized alterations.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.21: Dangerous Goods Transportation Classification Review]\nIncident Trace: Logistics systems flagged aerosol item ASIN B03M5021PL for omitting the required dangerous goods class documentation from its distribution profile.\nTask: Explain how to update the catalog safety data sheet mappings to ensure compliance with transport safety rules.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.22: Brand Identity Theft via Lookalike Character Usage]\nIncident Trace: A merchant profile registered ASIN B03M5022PL using lookalike characters in the brand field to mimic a protected luxury fashion label.\nTask: Outline the remediation workflow to identify the lookalike text strings and apply an account block for deceptive catalog practices.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.23: Infant Nursery Furniture Structural Stability Review]\nIncident Trace: Customer return logs for nursery item ASIN B03M5023PL show rising concerns regarding structural tipping hazards during normal assembly configurations.\nTask: Formulate the quality engineering escalation steps required to suspend the listing pending a full safety audit.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.24: Parallel Import Electronics Warranty Invalidation Triage]\nIncident Trace: An importer added international variants of a smart device (ASIN B03M5024PL) into a region where local service centers cannot honor the product warranty.\nTask: Detail how to add clear customer-facing disclosures regarding regional warranty exclusions onto the detail page.", },
+            { text: "[ADVANCED REMEDIATION DRILL #3.25: Restricted Herbal Extract Ingestion Suppressing]\nIncident Trace: Botanical supplement ASIN B03M5025PL was found to contain an active plant extract that has been restricted from food products by regional safety administrations.\nTask: Detail the definitive catalog de-indexing steps required to remove the restricted item from all marketplace storefronts." }
+        ];
+
+        // --- DAY 4: 20 STRATEGIC COMPLEX CASES ---
+        const d4CasesData = [
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.1: Cross-Border Ingestion Contamination]\nAn operational alert surfaced across EU and NA storefronts simultaneously. ASIN B04C7001KK had its global title data corrupted across multiple regional indexing systems due to a corrupted external synchronization tool API payload. The brand owner cannot correct attributes because the listing is systemically locked down due to high safety risk flags.\nTask: Map out a comprehensive mitigation strategy to clear the safety flag, reset localized string indices, and restore historical brand authority across all respective international nodes.", solution: "STRATEGIC EXECUTION: Override localized listing blocks using high-tier administrative clearance keys. Separate regional marketplace syndications, re-run automated product safety classifiers against local documentation, and re-inject verified brand catalog payloads directly into the global marketplace indexing fabric." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.2: GL String Migration Failure]\nA massive category reorganization script failed mid-execution, leaving 14,000 premium electronics listings (including ASIN B04C7002KK) stranded in a legacy 'Gifts & Novelties' general ledger category slot. This misclassification deactivated all specialized refinement search filters and broke tax rate calculations for active orders.\nTask: Design an automated data migration recovery flow to re-assign the correct item classifications without dropping active marketing placements.", solution: "STRATEGIC EXECUTION: Run a database correction script to move the affected ASIN array back to the core Consumer Electronics GL structure. Re-build the item taxonomy trees, reset active tax calculation matrices, and trigger an immediate search index update." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.3: Systemic Pricing Engine Glitch]\nA currency conversion calculation error within an automated international repricing tool caused ASIN B04C7003KK to publish an active price of $0.05 instead of $500.00. High-frequency consumer scrapers placed thousands of orders before automated safety controls paused the listing, generating processing backlogs.\nTask: Outline the technical recovery steps to correct the pricing attributes, coordinate order cancellation approvals, and safely reactivate the catalog listing.", solution: "STRATEGIC EXECUTION: Enforce an immediate price hold lock on the listing page. Cancel pending orders flagged as data errors, correct the currency exchange valuation parameters, and safely unlock the detail page for public access." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.4: Brand Registry Hijack Remediation]\nA compromised high-tier vendor account changed administrative access permissions for an enrolled trademark group, removing the original brand owner and altering key product identifiers for high-velocity item ASIN B04C7004KK.\nTask: Formulate an emergency recovery plan to restore administrative access to the rightful brand owner and fix the modified catalog attributes.", solution: "STRATEGIC EXECUTION: Revoke the compromised vendor credentials and restore administrative access rights to the certified brand owner token. Reverse the unauthorized attribute modifications using verified historical backup files." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.5: Global ASIN Lockout Recovery]\nConflicting high-priority retail updates from two separate international operational hubs caused an administrative data deadlock, locking the catalog record for ASIN B04C7005KK and preventing any future inventory updates.\nTask: Explain the technical process to clear the data deadlock and restore normal edit permissions to the listing profile.", solution: "STRATEGIC EXECUTION: Use administrative database overrides to clear the data lock. Reset the configuration priority order across the conflicting regional hubs and re-index the canonical product record." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.6: Counterfeit Vector Suppression]\nAn organized fraud network bypassed standard security filters by using private listing invitations to distribute lookalike products under ASIN B04C7006KK, resulting in rising customer complaint rates.\nTask: Design a comprehensive screening protocol to identify shared account indicators among the fraudulent sellers and remove the unauthorized listings.", solution: "STRATEGIC EXECUTION: Deploy automated tracking scripts to identify related merchant accounts within the network. Terminate the unauthorized seller offers and restrict listing privileges to authorized brand distributors." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.7: Dangerous Goods Transport Compliance]\nPhysical safety inspections discovered that ASIN B04C7007KK contains active chemical compounds that require special shipping containers, contradicting the 'unrestricted' status listed in the catalog data.\nTask: Detail the immediate compliance steps required to update the catalog safety data and move the inventory to specialized storage facilities.", solution: "STRATEGIC EXECUTION: Update the product's hazard classification metadata to require dangerous goods handling. Pause regular shipping workflows and move the inventory to specialized Hazmat areas." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.8: Hazardous Material Inbound Discrepancy]\nFulfillment centers reported that shipments received for ASIN B04C7008KK feature pressurized canisters, although the catalog documentation describes the item as a non-pressurized liquid system.\nTask: Outline the safety containment steps and catalog correction flows required to resolve the product safety mismatch.", solution: "STRATEGIC EXECUTION: Place an immediate safety hold on the inbound inventory. Update the product classification record to reflect the pressurized safety profile and verify compliance documentation before releasing the hold." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.9: Duplicate Parent Consolidation]\nMultiple independent distributors generated separate parent variation structures for the same product line, resulting in fragmented customer reviews and confused search rankings for ASIN B04C7009KK.\nTask: Outline the catalog merging workflow to consolidate the separate variation trees into a single, clean canonical listing structure.", solution: "STRATEGIC EXECUTION: Select the authentic brand-created parent node as the canonical listing structure. Merge the duplicate variation entries into the target family and clean the search index mappings." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.10: Review Invalidation and Splitting]\nAn unauthorized parent-child listing merge combined the user reviews of an inexpensive accessory item with a premium electronics item under ASIN B04C7010KK, manipulating the product rating metrics.\nTask: Detail the data remediation steps required to split the incorrect relationship and assign the historical reviews back to their respective items.", solution: "STRATEGIC EXECUTION: Break the incorrect parental variation relationship. Separate historical customer reviews using product transaction identifiers and re-index both product profiles independently." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.11: Restricted Ingredient Deep Purge]\nNew public health guidelines added an active herb used in dietary supplement ASIN B04C7011KK to the restricted substances registry, requiring immediate removal from the active marketplace catalog.\nTask: Map out the global de-indexing steps required to remove the restricted product from all regional storefront locations.", solution: "STRATEGIC EXECUTION: Implement an un-appealable global product suppression flag on the ASIN. Remove the listing from active search indexes and initiate inventory disposal workflows for fulfillment center stock." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.12: Automated Image Hijack Override]\nA legacy data exchange vulnerability allowed an unverified external data feed to replace the primary product images of high-traffic listing ASIN B04C7012KK with low-quality promotional banners.\nTask: Detail the recovery steps to secure the image configuration variables and restore the original brand asset links.", solution: "STRATEGIC EXECUTION: Revert the image configuration pointers to the verified brand asset directory. Terminate the legacy data feed access privileges and restrict image modification rights to the brand owner." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.13: Bulk Listing Metadata Correction]\nA corrupted spreadsheet ingestion payload altered the manufacturing part numbers for 500 active hardware items under parent ASIN B04C7013KK, breaking downstream warehouse picking routing lines.\nTask: Formulate an automated correction pipeline to parse verified manufacturer data files and fix the broken catalog records.", solution: "STRATEGIC EXECUTION: Ingest the verified manufacturer reference data file via the High-Priority Update Utility. Overwrite the broken part number fields and verify downstream warehouse system synchronization." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.14: UPC Exclusivity Mapping Realignment]\nAn administrative data entry error assigned a single exclusive UPC barcode to two entirely different consumer electronics items, generating severe inventory tracking conflicts for ASIN B04C7014KK.\nTask: Explain the technical isolation steps required to separate the conflicting product records and map them to their distinct barcodes.", solution: "STRATEGIC EXECUTION: Create a new separate product identifier entry within the catalog database. Re-map the conflicting items to their authentic verified barcodes and clear the inventory tracking logs." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.15: Parallel Import Exclusion Sweep]\nAuthorized brand networks flagged ASIN B04C7015KK for distributing international variations of a product inside a territory where it lacks the necessary regional certification approvals.\nTask: Map out the geographical filtering rules required to restrict the listing access to compliant regions within the catalog engine.", solution: "STRATEGIC EXECUTION: Implement strict country-code shipping restrictions on the product record. Suppress non-certified merchant offers from the regional storefront and verify local compliance parameters." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.16: Traceability Token Validation]\nAn audit of luxury cosmetic item ASIN B04C7016KK revealed that an unverified reseller network modified the product descriptions to remove required traceability batch data fields.\nTask: Outline the enforcement actions required to restore the mandatory compliance fields and verify reseller documentation authenticity.", solution: "STRATEGIC EXECUTION: Lock the listing description fields to the verified brand owner configuration. Require active resellers to present authentic invoice documentation or face offer suppression." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.17: Expired Product Risk Assessment]\nCustomer feedback logs for grocery item ASIN B04C7017KK showed a rising frequency of complaints regarding expired products, indicating a failure in fulfillment center rotational sweeping filters.\nTask: Design an automated quality gate within the catalog metadata to require explicit expiration tracking parameters for the item family.", solution: "STRATEGIC EXECUTION: Turn on the mandatory expiration tracking flag within the product category metadata schema. Put the listing on a temporary hold until fulfillment centers verify active date codes." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.18: Text Layout Deserialization Patch]\nA structural system error corrupted the product detail page formatting for ASIN B04C7018KK, rendering the text description as unreadable raw binary code lines for public users.\nTask: Detail the technical recovery steps to fix the corrupted text fields and force a clean re-rendering of the product page layout.", solution: "STRATEGIC EXECUTION: Run a data repair routine to replace the corrupted text fields with verified plain text backups. Flush the database caching layer to update the public product page display." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.19: Search Index Suppression Rollback]\nAn over-aggressive security keyword filter mistakenly flagged high-volume listing ASIN B04C7019KK for policy violations, removing it from public search results.\nTask: Walk through the verification process to audit the automated flag, clear the false positive block, and re-index the product listing.", solution: "STRATEGIC EXECUTION: Review the triggered keyword rule manually to confirm the false positive status. Deactivate the security block and initiate a full search engine index crawl for the ASIN." },
+            { text: "[BRAND INTEGRITY COMPLEX STUDY #4.20: Pesticide False Positive Resolution]\nAn apparel product listing (ASIN B04C7020KK) was automatically suppressed by safety filters because the product title included the text string 'antimicrobial protection', misclassifying it as a pesticide device.\nTask: Detail the remediation steps to update the descriptive terminology and clear the regulatory suppression flag.", solution: "STRATEGIC EXECUTION: Modify the listing text to use approved general descriptive terminology that satisfies style guides. Clear the automated pesticide device flag to restore standard page visibility." }
+        ];
+
+        // --- DAY 5: EXAM QUESTIONS ---
+        const examQuestionsData = [
+            { q: "A seller merges a listing for a discontinued charging cable with a highly rated wireless mouse to borrow its reviews. How should a Product Associate categorize this violation?", o: ["Product Type Misclassification", "Variation Abuse (ASIN Twisting)", "Intellectual Property Infringement", "Hazmat Safety Deviation"], a: 1 },
+            { q: "An automated feed from an external vendor overrides an enrolled brand's product image with incorrect formatting. What internal mechanic should be executed to solve this?", o: ["Delete the ASIN completely", "Reduce the seller's contribution score and lock attribute mapping to the Brand Registry token", "Initiate a physical warehouse audit", "Approve a global GL string migration"], a: 1 },
+            { q: "A listing is flagged for containing unauthorized therapeutic claims under federal drug regulations. What immediate action must be taken?", o: ["Suppress the ASIN and route to the Restricted Products Team for review", "Email the seller asking them to change the text within 14 days", "Change the category allocation to Home Goods", "Merge the ASIN into a parent family"], a: 0 },
+            { q: "Which tool should be utilized to correct historical review mappings when an unauthorized parent-child relationship is dismantled?", o: ["FBA Inventory Management Console", "Category Cleanup and ASIN Disruption Manager", "Brand Registry Authorization Matrix", "Dynamic Currency Conversion Switchboard"], a: 1 },
+            { q: "What is the primary indicator that a listing has suffered an attribute ownership hijack?", o: ["FBA storage fees increase suddenly", "Customer reviews drop to 0 stars", "The Detail Page contribution shifts from the Brand Owner to an unverified third-party merchant token", "The ASIN matches exactly with another duplicate identifier"], a: 2 }
+        ];
+
+        // ==================== APPLICATION CONTROLLER FRAMEWORK ====================
+
+        window.addEventListener("DOMContentLoaded", () => {
+            loadSavedProgressState();
+            renderAllSectionsDOM();
+            calculateGlobalProgress();
+            restoreActiveTabState();
+            setupAntiCheatFramework();
+        });
+
+        function renderAllSectionsDOM() {
+            // Day 1 Cases
+            const d1cBin = document.getElementById("day1-cases-bin");
+            d1CasesData.forEach((item, index) => {
+                const isComp = moduleTrackingState.day1_cases[index];
+                d1cBin.appendChild(createCaseCard("day1_cases", index, item.text, item.solution, isComp));
+            });
+
+            // Day 1 Drills
+            const d1dBin = document.getElementById("day1-drills-bin");
+            d1DrillsData.forEach((item, index) => {
+                const isComp = moduleTrackingState.day1_drills[index];
+                d1dBin.appendChild(createDrillCard("day1_drills", index, item.text, isComp));
+            });
+
+            // Day 2 Drills
+            const d2dBin = document.getElementById("day2-drills-bin");
+            d2DrillsData.forEach((item, index) => {
+                const isComp = moduleTrackingState.day2[index];
+                d2dBin.appendChild(createDrillCard("day2", index, item.text, isComp));
+            });
+
+            // Day 3 Drills
+            const d3dBin = document.getElementById("day3-drills-bin");
+            d3DrillsData.forEach((item, index) => {
+                const isComp = moduleTrackingState.day3[index];
+                d3dBin.appendChild(createDrillCard("day3", index, item.text, isComp));
+            });
+
+            // Day 4 Cases
+            const d4cBin = document.getElementById("day4-cases-bin");
+            d4CasesData.forEach((item, index) => {
+                const isComp = moduleTrackingState.day4[index];
+                d4cBin.appendChild(createCaseCard("day4", index, item.text, item.solution, isComp));
+            });
+        }
+
+        function createCaseCard(moduleKey, index, text, solution, isCompleted) {
+            const card = document.createElement("div");
+            card.className = `static-case-item ${isCompleted ? 'completed' : ''}`;
+            card.id = `card-${moduleKey}-${index}`;
+            card.innerHTML = `
+                <div class="case-text">${text}</div>
+                <div class="static-solution-block"><strong>RECOMMENDED MITIGATION OUTLINE:</strong><br>${solution}</div>
+                <div style="margin-top:20px; text-align:right;">
+                    <button class="submit-item-btn ${isCompleted ? 'done' : ''}" 
+                            id="btn-${moduleKey}-${index}" 
+                            onclick="markCaseAsRead('${moduleKey}', ${index})">
+                        ${isCompleted ? '✓ Analyzed & Completed' : 'Acknowledge Case Review'}
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function createDrillCard(moduleKey, index, text, isCompleted) {
+            const card = document.createElement("div");
+            card.className = `drill-item ${isCompleted ? 'completed' : ''}`;
+            card.id = `card-${moduleKey}-${index}`;
+            const inputVal = textInputsState[`${moduleKey}-${index}`] || "";
+            card.innerHTML = `
+                <div class="drill-text">${text}</div>
+                <textarea class="solution-box" id="input-${moduleKey}-${index}" 
+                          placeholder="Type your strategic analysis and specific corrective step sequence here..." 
+                          ${isCompleted ? 'disabled' : ''} oninput="cacheTextInput('${moduleKey}', ${index})">${inputVal}</textarea>
+                <div style="text-align:right;">
+                    <button class="submit-item-btn ${isCompleted ? 'done' : ''}" 
+                            id="btn-${moduleKey}-${index}" 
+                            onclick="submitDrillVerification('${moduleKey}', ${index})">
+                        ${isCompleted ? '✓ Logic Verified' : 'Submit Diagnostic Resolution'}
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function markCaseAsRead(moduleKey, index) {
+            if(moduleTrackingState[moduleKey][index]) return;
+            moduleTrackingState[moduleKey][index] = true;
+            document.getElementById(`card-${moduleKey}-${index}`).classList.add("completed");
+            const btn = document.getElementById(`btn-${moduleKey}-${index}`);
+            btn.classList.add("done");
+            btn.innerText = "✓ Analyzed & Completed";
+            saveProgressToStorage();
+            calculateGlobalProgress();
+        }
+
+        function cacheTextInput(moduleKey, index) {
+            const val = document.getElementById(`input-${moduleKey}-${index}`).value;
+            textInputsState[`${moduleKey}-${index}`] = val;
+            localStorage.setItem(STORAGE_TEXT_KEY, JSON.stringify(textInputsState));
+        }
+
+        function submitDrillVerification(moduleKey, index) {
+            if(moduleTrackingState[moduleKey][index]) return;
+            const textVal = document.getElementById(`input-${moduleKey}-${index}`).value.trim();
+            if(textVal.length < 15) {
+                alert("Validation Exception: Your resolution details are insufficient. Please supply a thorough operational process plan to ensure catalog safety.");
+                return;
+            }
+            moduleTrackingState[moduleKey][index] = true;
+            document.getElementById(`card-${moduleKey}-${index}`).classList.add("completed");
+            document.getElementById(`input-${moduleKey}-${index}`).disabled = true;
+            const btn = document.getElementById(`btn-${moduleKey}-${index}`);
+            btn.classList.add("done");
+            btn.innerText = "✓ Logic Verified";
+            saveProgressToStorage();
+            calculateGlobalProgress();
+        }
+
+        function calculateGlobalProgress() {
+            const weights = { day1_cases: 20, day1_drills: 25, day2: 25, day3: 25, day4: 20 };
+            let totalItems = 0, completedItems = 0;
+
+            for (let key in weights) {
+                totalItems += weights[key];
+                completedItems += moduleTrackingState[key].filter(Boolean).length;
+            }
+
+            const globalPercent = Math.round((completedItems / totalItems) * 100);
+            document.getElementById("master-progress-bar").style.width = `${globalPercent}%`;
+
+            // Individual badges
+            const d1Comp = moduleTrackingState.day1_cases.filter(Boolean).length + moduleTrackingState.day1_drills.filter(Boolean).length;
+            document.getElementById("badge-day1").innerText = `${Math.round((d1Comp / 45) * 100)}%`;
+            document.getElementById("badge-day2").innerText = `${Math.round((moduleTrackingState.day2.filter(Boolean).length / 25) * 100)}%`;
+            document.getElementById("badge-day3").innerText = `${Math.round((moduleTrackingState.day3.filter(Boolean).length / 25) * 100)}%`;
+            document.getElementById("badge-day4").innerText = `${Math.round((moduleTrackingState.day4.filter(Boolean).length / 20) * 100)}%`;
+
+            // Day 5 unlock check
+            const examBtn = document.getElementById("btn-day5");
+            if(globalPercent === 100) {
+                examBtn.classList.remove("locked");
+                examBtn.disabled = false;
+                examBtn.innerHTML = "Day 5: Certification Exam 🔓";
+            } else {
+                examBtn.classList.add("locked");
+                examBtn.disabled = true;
+                examBtn.innerHTML = "Day 5: Certification Exam 🔐";
+            }
+        }
+
+        function navigateToSection(sectionId) {
+            document.querySelectorAll(".day-section").forEach(s => s.classList.remove("active"));
+            document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
+            document.getElementById(sectionId).classList.add("active");
+            
+            const targetBtnId = "btn-" + sectionId.split("-")[0];
+            const targetBtn = document.getElementById(targetBtnId);
+            if(targetBtn) targetBtn.classList.add("active");
+
+            localStorage.setItem(STORAGE_TAB_KEY, sectionId);
+            document.getElementById("main-viewport").scrollTop = 0;
+        }
+
+        function restoreActiveTabState() {
+            const savedTab = localStorage.getItem(STORAGE_TAB_KEY);
+            if (savedTab && document.getElementById(savedTab)) {
+                navigateToSection(savedTab);
+            }
+        }
+
+        function saveProgressToStorage() {
+            localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(moduleTrackingState));
+        }
+
+        function loadSavedProgressState() {
+            const stored = localStorage.getItem(STORAGE_STATE_KEY);
+            if(stored) moduleTrackingState = JSON.parse(stored);
+            const txts = localStorage.getItem(STORAGE_TEXT_KEY);
+            if(txts) textInputsState = JSON.parse(txts);
+        }
+
+        function clearSavedProgress() {
+            if(confirm("Are you sure you want to completely flush your current Amazon competency training metrics? All input summaries will be deleted.")) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        // --- SECURITY AND PROCTORED TESTING SYSTEM ---
+        let cheatCheckActive = false;
+
+        function setupAntiCheatFramework() {
+            window.addEventListener("blur", () => {
+                if(cheatCheckActive) triggerSecurityTermination();
+            });
+            document.addEventListener("visibilitychange", () => {
+                if(document.visibilityState === 'hidden' && cheatCheckActive) {
+                    triggerSecurityTermination();
+                }
+            });
+        }
+
+        function triggerExamLaunchSequence() {
+            document.getElementById("exam-instructions-modal").style.display = "flex";
+        }
+
+        function launchProctoredExamViewport() {
+            document.getElementById("exam-instructions-modal").style.display = "none";
+            document.getElementById("secure-exam-overlay").style.display = "block";
+            
+            const bodyElem = document.documentElement;
+            if (bodyElem.requestFullscreen) bodyElem.requestFullscreen();
+            
+            renderExamQuestions();
+            setTimeout(() => { cheatCheckActive = true; }, 1000);
+        }
+
+        function renderExamQuestions() {
+            const form = document.getElementById("proctored-exam-form");
+            form.innerHTML = "";
+            examQuestionsData.forEach((qObj, qIdx) => {
+                const card = document.createElement("div");
+                card.className = "exam-question-card";
+                card.innerHTML = `
+                    <div class="exam-question-text">Question ${qIdx + 1}: ${qObj.q}</div>
+                    <div id="options-group-${qIdx}">
+                        ${qObj.o.map((opt, oIdx) => `
+                            <label class="exam-option-wrapper">
+                                <input type="radio" name="question-${qIdx}" value="${oIdx}" style="margin-right:12px;"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                form.appendChild(card);
+            });
+        }
+
+        function evaluateExamSubmission() {
+            cheatCheckActive = false;
+            let correctCount = 0;
+            examQuestionsData.forEach((qObj, qIdx) => {
+                const selected = document.querySelector(`input[name="question-${qIdx}"]:checked`);
+                if(selected && parseInt(selected.value) === qObj.a) {
+                    correctCount++;
+                }
+            });
+
+            const scorePercent = (correctCount / examQuestionsData.length) * 100;
+            if(document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+
+            document.getElementById("secure-exam-overlay").style.display = "none";
+
+            if(scorePercent >= 80) {
+                alert(`🎉 Congratulations! You achieved a score of ${scorePercent}% on the competency metrics matrix. Your specialized Amazon Product Associate credentials have been assigned.`);
+            } else {
+                alert(`❌ Competency threshold not met. Your current calculation is ${scorePercent}%. The passing limit is 80%. Please try again.`);
+            }
+            window.location.reload();
+        }
+
+        function triggerSecurityTermination() {
+            cheatCheckActive = false;
+            document.getElementById("secure-exam-overlay").style.display = "none";
+            document.getElementById("exam-instructions-modal").style.display = "none";
+            document.getElementById("cheat-lockout-screen").style.display = "flex";
+            if(document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+        }
+    </script>
+</body>
+</html>
